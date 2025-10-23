@@ -1,0 +1,67 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Analyses collection
+    match /analyses/{analysisId} {
+      // Users can read their own analyses
+      allow read: if request.auth != null &&
+                     resource.data.userId == request.auth.uid;
+
+      // Users can create their own analyses
+      allow create: if request.auth != null &&
+                       request.resource.data.userId == request.auth.uid;
+
+      // Cloud Functions can update any analysis
+      allow update: if request.auth == null; // Cloud Function has no auth
+
+      // Users can delete their own analyses
+      allow delete: if request.auth != null &&
+                       resource.data.userId == request.auth.uid;
+    }
+
+    // Users collection
+    match /users/{userId} {
+      // Users can read and write their own data
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      // Cloud Functions can read and write any user data
+      allow read, write: if request.auth == null;
+    }
+
+    // Crops collection
+    match /crops/{cropId} {
+      // All authenticated users can read crops
+      allow read: if request.auth != null;
+      
+      // Users can create crops
+      allow create: if request.auth != null;
+      
+      // Cloud Functions can update any crop
+      allow update: if request.auth == null;
+      
+      // Users can delete their own crops
+      allow delete: if request.auth != null &&
+                       resource.data.userId == request.auth.uid;
+    }
+
+    // Diseases collection
+    match /diseases/{diseaseId} {
+      // All authenticated users can read diseases
+      allow read: if request.auth != null;
+      
+      // Cloud Functions can create and update diseases
+      allow create, update: if request.auth == null;
+    }
+
+    // Treatments collection
+    match /treatments/{treatmentId} {
+      // All authenticated users can read treatments
+      allow read: if request.auth != null;
+      
+      // Cloud Functions can create and update treatments
+      allow create, update: if request.auth == null;
+    }
+  }
+}
+

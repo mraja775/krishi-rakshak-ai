@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App -->
+    <string name="app_name">கிருஷி ரக்ஷக் AI</string>
+
+    <!-- Language Selection -->
+    <string name="select_language">மொழியைத் தேர்ந்தெடுக்கவும்</string>
+    <string name="language_english">English</string>
+    <string name="language_hindi">हिंदी (Hindi)</string>
+    <string name="language_tamil">தமிழ் (Tamil)</string>
+    <string name="language_kannada">ಕನ್ನಡ (Kannada)</string>
+    <string name="continue_btn">தொடரவும்</string>
+
+    <!-- Authentication -->
+    <string name="phone_number_hint">மொபைல் எண்ணை உள்ளிடவும்</string>
+    <string name="phone_number_label">மொபைல் எண்</string>
+    <string name="send_otp">OTP அனுப்பவும்</string>
+    <string name="verify_otp">சரிபார்க்கவும்</string>
+    <string name="otp_hint">6 இலக்க OTP ஐ உள்ளிடவும்</string>
+    <string name="otp_label">OTP குறியீடு</string>
+    <string name="resend_otp">OTP ஐ மீண்டும் அனுப்பவும்</string>
+    <string name="verifying">சரிபார்க்கப்படுகிறது…</string>
+    <string name="otp_sent">OTP வெற்றிகரமாக அனுப்பப்பட்டது</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">முகப்பு</string>
+    <string name="nav_history">வரலாறு</string>
+    <string name="nav_profile">சுயவிவரம்</string>
+
+    <!-- Home Screen -->
+    <string name="welcome">வரவேற்கிறோம்!</string>
+    <string name="analyze_plant">செடியை பகுப்பாய்வு செய்யவும்</string>
+    <string name="take_photo_instruction">நோய்களைக் கண்டறிய உங்கள் செடியின் புகைப்படத்தை எடுக்கவும்</string>
+
+    <!-- Camera -->
+    <string name="camera">கேமரா</string>
+    <string name="take_photo">புகைப்படம் எடுக்கவும்</string>
+    <string name="retake">மீண்டும் எடுக்கவும்</string>
+    <string name="use_photo">புகைப்படத்தைப் பயன்படுத்தவும்</string>
+    <string name="choose_from_gallery">கேலரியிலிருந்து தேர்வு செய்க</string>
+
+    <!-- Analysis Loading -->
+    <string name="uploading_image">படம் பதிவேற்றப்படுகிறது…</string>
+    <string name="ai_analyzing">AI உங்கள் செடியை பகுப்பாய்வு செய்கிறது…</string>
+    <string name="please_wait">இது சில நொடிகள் ஆகலாம்</string>
+    <string name="upload_progress">பதிவேற்றுகிறது: %d%%</string>
+
+    <!-- Analysis Result -->
+    <string name="analysis_result">பகுப்பாய்வு முடிவு</string>
+    <string name="plant_type">செடி வகை</string>
+    <string name="disease">நோய்</string>
+    <string name="disease_name">நோயின் பெயர்</string>
+    <string name="scientific_name">அறிவியல் பெயர்</string>
+    <string name="severity">தீவிரம்</string>
+    <string name="confidence">நம்பிக்கை</string>
+    <string name="description">விளக்கம்</string>
+    <string name="symptoms">அறிகுறிகள்</string>
+    <string name="causes">காரணங்கள்</string>
+    <string name="preventive_measures">தடுப்பு நடவடிக்கைகள்</string>
+    <string name="recommendations">பரிந்துரைகள்</string>
+    <string name="view_history">வரலாற்றைக் காண்க</string>
+    <string name="analyze_another">மற்றொரு செடியை பகுப்பாய்வு செய்க</string>
+
+    <!-- Severity Levels -->
+    <string name="severity_low">குறைவு</string>
+    <string name="severity_medium">மத்திய</string>
+    <string name="severity_high">அதிகம்</string>
+    <string name="severity_critical">கடுமையானது</string>
+
+    <!-- History Screen -->
+    <string name="history_title">பகுப்பாய்வு வரலாறு</string>
+    <string name="no_history_title">பகுப்பாய்வு வரலாறு இல்லை</string>
+    <string name="no_history_message">உங்கள் வரலாற்றை இங்கே பார்க்க செடிகளை பகுப்பாய்வு செய்யத் தொடங்கவும்</string>
+    <string name="unknown_plant">அறியப்படாத செடி</string>
+    <string name="delete">நீக்கு</string>
+    <string name="delete_analysis">பகுப்பாய்வை நீக்கு</string>
+    <string name="delete_confirmation">இந்த பகுப்பாய்வை நிச்சயமாக நீக்க விரும்புகிறீர்களா? இந்த செயலை மாற்ற முடியாது.</string>
+    <string name="cancel">ரத்து செய்</string>
+
+    <!-- Status -->
+    <string name="status_pending">நிலுவையில்</string>
+    <string name="status_processing">செயலாக்கப்படுகிறது</string>
+    <string name="status_completed">முடிந்தது</string>
+    <string name="status_failed">தோல்வி</string>
+
+    <!-- Profile Screen -->
+    <string name="profile_title">சுயவிவரம்</string>
+    <string name="language_settings">மொழி அமைப்புகள்</string>
+    <string name="change_language">மொழியை மாற்று</string>
+    <string name="about">பற்றி</string>
+    <string name="app_version">ஆப் பதிப்பு</string>
+    <string name="logout">வெளியேறு</string>
+    <string name="logout_confirmation">நிச்சயமாக வெளியேற விரும்புகிறீர்களா?</string>
+
+    <!-- Errors -->
+    <string name="error_loading_history">வரலாற்றை ஏற்றுவதில் பிழை</string>
+    <string name="error_network">இணைய இணைப்பு இல்லை</string>
+    <string name="error_generic">ஏதோ தவறு நடந்தது</string>
+    <string name="error_auth">அங்கீகாரம் தோல்வி</string>
+    <string name="error_invalid_phone">சரியான தொலைபேசி எண்ணை உள்ளிடவும்</string>
+    <string name="error_invalid_otp">சரியான 6 இலக்க OTP ஐ உள்ளிடவும்</string>
+    <string name="error_upload_failed">படம் பதிவேற்றம் தோல்வி</string>
+    <string name="error_analysis_failed">பகுப்பாய்வு தோல்வி</string>
+    <string name="retry">மீண்டும் முயற்சிக்கவும்</string>
+
+    <!-- Common -->
+    <string name="ok">சரி</string>
+    <string name="yes">ஆம்</string>
+    <string name="no">இல்லை</string>
+    <string name="back">பின்செல்</string>
+    <string name="close">மூடு</string>
+    <string name="save">சேமி</string>
+    <string name="loading">ஏற்றுகிறது…</string>
+</resources>

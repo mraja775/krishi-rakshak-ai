@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App -->
+    <string name="app_name">कृषि रक्षक AI</string>
+
+    <!-- Language Selection -->
+    <string name="select_language">भाषा चुनें</string>
+    <string name="language_english">English</string>
+    <string name="language_hindi">हिंदी (Hindi)</string>
+    <string name="language_tamil">தமிழ் (Tamil)</string>
+    <string name="language_kannada">ಕನ್ನಡ (Kannada)</string>
+    <string name="continue_btn">जारी रखें</string>
+
+    <!-- Authentication -->
+    <string name="phone_number_hint">मोबाइल नंबर दर्ज करें</string>
+    <string name="phone_number_label">मोबाइल नंबर</string>
+    <string name="send_otp">OTP भेजें</string>
+    <string name="verify_otp">सत्यापित करें</string>
+    <string name="otp_hint">6 अंकों का OTP दर्ज करें</string>
+    <string name="otp_label">OTP कोड</string>
+    <string name="resend_otp">OTP पुनः भेजें</string>
+    <string name="verifying">सत्यापित हो रहा है…</string>
+    <string name="otp_sent">OTP सफलतापूर्वक भेजा गया</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">होम</string>
+    <string name="nav_history">इतिहास</string>
+    <string name="nav_profile">प्रोफ़ाइल</string>
+
+    <!-- Home Screen -->
+    <string name="welcome">स्वागत है!</string>
+    <string name="analyze_plant">पौधे का विश्लेषण करें</string>
+    <string name="take_photo_instruction">रोगों का पता लगाने के लिए अपने पौधे की तस्वीर लें</string>
+
+    <!-- Camera -->
+    <string name="camera">कैमरा</string>
+    <string name="take_photo">फोटो लें</string>
+    <string name="retake">फिर से लें</string>
+    <string name="use_photo">फोटो उपयोग करें</string>
+    <string name="choose_from_gallery">गैलरी से चुनें</string>
+
+    <!-- Analysis Loading -->
+    <string name="uploading_image">तस्वीर अपलोड हो रही है…</string>
+    <string name="ai_analyzing">AI आपके पौधे का विश्लेषण कर रहा है…</string>
+    <string name="please_wait">इसमें कुछ सेकंड लग सकते हैं</string>
+    <string name="upload_progress">अपलोड हो रहा है: %d%%</string>
+
+    <!-- Analysis Result -->
+    <string name="analysis_result">विश्लेषण परिणाम</string>
+    <string name="plant_type">पौधे का प्रकार</string>
+    <string name="disease">रोग</string>
+    <string name="disease_name">रोग का नाम</string>
+    <string name="scientific_name">वैज्ञानिक नाम</string>
+    <string name="severity">गंभीरता</string>
+    <string name="confidence">विश्वास</string>
+    <string name="description">विवरण</string>
+    <string name="symptoms">लक्षण</string>
+    <string name="causes">कारण</string>
+    <string name="preventive_measures">निवारक उपाय</string>
+    <string name="recommendations">सिफारिशें</string>
+    <string name="view_history">इतिहास देखें</string>
+    <string name="analyze_another">दूसरे पौधे का विश्लेषण करें</string>
+
+    <!-- Severity Levels -->
+    <string name="severity_low">कम</string>
+    <string name="severity_medium">मध्यम</string>
+    <string name="severity_high">उच्च</string>
+    <string name="severity_critical">गंभीर</string>
+
+    <!-- History Screen -->
+    <string name="history_title">विश्लेषण इतिहास</string>
+    <string name="no_history_title">कोई विश्लेषण इतिहास नहीं</string>
+    <string name="no_history_message">अपना इतिहास यहां देखने के लिए पौधों का विश्लेषण शुरू करें</string>
+    <string name="unknown_plant">अज्ञात पौधा</string>
+    <string name="delete">हटाएं</string>
+    <string name="delete_analysis">विश्लेषण हटाएं</string>
+    <string name="delete_confirmation">क्या आप वाकई इस विश्लेषण को हटाना चाहते हैं? यह कार्रवाई पूर्ववत नहीं की जा सकती।</string>
+    <string name="cancel">रद्द करें</string>
+
+    <!-- Status -->
+    <string name="status_pending">लंबित</string>
+    <string name="status_processing">प्रक्रिया में</string>
+    <string name="status_completed">पूर्ण</string>
+    <string name="status_failed">विफल</string>
+
+    <!-- Profile Screen -->
+    <string name="profile_title">प्रोफ़ाइल</string>
+    <string name="language_settings">भाषा सेटिंग्स</string>
+    <string name="change_language">भाषा बदलें</string>
+    <string name="about">के बारे में</string>
+    <string name="app_version">ऐप संस्करण</string>
+    <string name="logout">लॉगआउट</string>
+    <string name="logout_confirmation">क्या आप वाकई लॉगआउट करना चाहते हैं?</string>
+
+    <!-- Errors -->
+    <string name="error_loading_history">इतिहास लोड करने में त्रुटि</string>
+    <string name="error_network">इंटरनेट कनेक्शन नहीं है</string>
+    <string name="error_generic">कुछ गलत हो गया</string>
+    <string name="error_auth">प्रमाणीकरण विफल</string>
+    <string name="error_invalid_phone">कृपया एक मान्य फोन नंबर दर्ज करें</string>
+    <string name="error_invalid_otp">कृपया एक मान्य 6 अंकों का OTP दर्ज करें</string>
+    <string name="error_upload_failed">तस्वीर अपलोड विफल</string>
+    <string name="error_analysis_failed">विश्लेषण विफल</string>
+    <string name="retry">पुनः प्रयास करें</string>
+
+    <!-- Common -->
+    <string name="ok">ठीक है</string>
+    <string name="yes">हां</string>
+    <string name="no">नहीं</string>
+    <string name="back">वापस</string>
+    <string name="close">बंद करें</string>
+    <string name="save">सहेजें</string>
+    <string name="loading">लोड हो रहा है…</string>
+</resources>
