@@ -175,3 +175,16 @@ test("storage: rejects >5MB, non-images, other users' folders, anon", async () =
   await assertFails(uploadBytes(ref(a, `analysis-results/${ALICE}/x.json`),
     jpeg(10), {contentType: "application/json"}));
 });
+
+// ---------- _system (kill switch / usage counters) ----------
+test("_system: clients can neither read nor write spend-guard docs", async () => {
+  for (const ctx of [alice(), anon()]) {
+    const db = ctx.firestore();
+    await assertFails(getDoc(doc(db, "_system", "config")));
+    await assertFails(setDoc(doc(db, "_system", "config"),
+      {aiEnabled: true}));
+    await assertFails(getDoc(doc(db, "_system", "usage_20260101")));
+    await assertFails(setDoc(doc(db, "_system", "usage_20260101"),
+      {count: 0}));
+  }
+});

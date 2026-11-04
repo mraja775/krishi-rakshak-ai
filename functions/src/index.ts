@@ -1,4 +1,6 @@
 import {onObjectFinalized} from "firebase-functions/v2/storage";
+import {onMessagePublished} from "firebase-functions/v2/pubsub";
+import {GoogleAuth} from "google-auth-library";
 import * as admin from "firebase-admin";
 import {Storage} from "@google-cloud/storage";
 import {VertexAI} from "@google-cloud/vertexai";
@@ -22,6 +24,17 @@ const ALLOWED_CONTENT_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5 MB
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
 const RATE_LIMIT_MAX_ANALYSES = 20; // per user per window
+// Project-wide ceiling on Gemini calls per UTC day (hard cost backstop).
+const GLOBAL_DAILY_MAX_ANALYSES =
+  Number(process.env.GLOBAL_DAILY_MAX_ANALYSES) || 500;
+
+// Kill switch / budget guard (see docs/COST_CONTROLS.md)
+const SYSTEM_COLLECTION = "_system";
+const CONFIG_DOC = "config";
+const CONFIG_CACHE_MS = 60 * 1000;
+const BUDGET_TOPIC = process.env.BUDGET_TOPIC || "billing-budget-alerts";
+const BUDGET_SOFT_KILL_RATIO = 0.8; // disable AI at 80% of budget
+const BUDGET_HARD_KILL = process.env.BUDGET_HARD_KILL === "true";
 
 // Limits applied to AI output before it is written to Firestore
 const MAX_PLANT_TYPE_LEN = 100;
@@ -101,6 +114,23 @@ export const analyzeImage = onObjectFinalized(
       if (countSnap.data().count > RATE_LIMIT_MAX_ANALYSES) {
         console.warn("Rate limit exceeded for analysis:", analysisRef.id);
         await markFailed(analysisRef, "Rate limit exceeded");
+        return;
+      }
+
+      // Kill switch (set manually or by budgetGuard)
+      if (!(await isAiEnabled())) {
+        console.warn("AI disabled by kill switch:", analysisRef.id);
+        await markFailed(analysisRef, "Analysis temporarily disabled");
+        return;
+      }
+
+      // Project-wide daily cap
+      if (!(await reserveDailySlot())) {
+        console.warn("Global daily cap reached:", analysisRef.id);
+        await markFailed(
+          analysisRef,
+          "Service is at capacity today, please try again tomorrow"
+        );
         return;
       }
 
@@ -466,4 +496,141 @@ Return ONLY the JSON object, no additional text.
   }
 
   return sanitizeResult(parsed);
+}
+
+// ---------------------------------------------------------------------------
+// Spend guards
+// ---------------------------------------------------------------------------
+
+let configCache: {aiEnabled: boolean, fetchedAt: number} | null = null;
+
+/**
+ * Whether AI analysis is enabled (`_system/config.aiEnabled !== false`).
+ * Cached in memory for CONFIG_CACHE_MS to avoid a read per upload.
+ * @return {Promise<boolean>} true unless explicitly disabled
+ */
+async function isAiEnabled(): Promise<boolean> {
+  const now = Date.now();
+  if (configCache && now - configCache.fetchedAt < CONFIG_CACHE_MS) {
+    return configCache.aiEnabled;
+  }
+  const snap = await firestore
+    .collection(SYSTEM_COLLECTION)
+    .doc(CONFIG_DOC)
+    .get();
+  const aiEnabled = snap.get("aiEnabled") !== false;
+  configCache = {aiEnabled, fetchedAt: now};
+  return aiEnabled;
+}
+
+/**
+ * Atomically reserve one Gemini call against today's (UTC) global cap.
+ * @return {Promise<boolean>} false if the cap has been reached
+ */
+async function reserveDailySlot(): Promise<boolean> {
+  const day = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+  const ref = firestore.collection(SYSTEM_COLLECTION).doc(`usage_${day}`);
+  return firestore.runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    const count = Number(snap.get("count")) || 0;
+    if (count >= GLOBAL_DAILY_MAX_ANALYSES) {
+      return false;
+    }
+    tx.set(ref, {
+      count: count + 1,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    }, {merge: true});
+    return true;
+  });
+}
+
+/**
+ * Cloud Billing budget notification payload (subset).
+ * https://cloud.google.com/billing/docs/how-to/budgets-programmatic-notifications
+ */
+interface BudgetNotification {
+  costAmount?: number;
+  budgetAmount?: number;
+  budgetDisplayName?: string;
+  currencyCode?: string;
+}
+
+/**
+ * Budget guard. Wire a Cloud Billing budget to the Pub/Sub topic
+ * BUDGET_TOPIC. At >= 80% of budget it turns AI analysis off via the
+ * kill switch. At >= 100% it disables billing for the project, but only
+ * if BUDGET_HARD_KILL=true. It never re-enables anything automatically.
+ */
+export const budgetGuard = onMessagePublished(
+  {
+    topic: BUDGET_TOPIC,
+    region: LOCATION,
+    maxInstances: 1,
+    timeoutSeconds: 60,
+    memory: "256MiB",
+  },
+  async (event) => {
+    const data = event.data.message.json as BudgetNotification | undefined;
+    const cost = Number(data?.costAmount);
+    const budget = Number(data?.budgetAmount);
+    if (!Number.isFinite(cost) || !Number.isFinite(budget) || budget <= 0) {
+      console.warn("budgetGuard: ignoring malformed notification");
+      return;
+    }
+    const ratio = cost / budget;
+    console.log(
+      `budgetGuard: ${data?.budgetDisplayName ?? "budget"} at ` +
+      `${(ratio * 100).toFixed(1)}% (${cost} / ${budget} ` +
+      `${data?.currencyCode ?? ""})`
+    );
+
+    if (ratio >= BUDGET_SOFT_KILL_RATIO) {
+      await firestore.collection(SYSTEM_COLLECTION).doc(CONFIG_DOC).set({
+        aiEnabled: false,
+        disabledReason: `Budget at ${(ratio * 100).toFixed(1)}%`,
+        disabledAt: admin.firestore.FieldValue.serverTimestamp(),
+      }, {merge: true});
+      configCache = null;
+      console.warn("budgetGuard: AI analysis disabled (kill switch set)");
+    }
+
+    if (ratio >= 1) {
+      if (BUDGET_HARD_KILL) {
+        await disableProjectBilling();
+      } else {
+        console.warn(
+          "budgetGuard: budget exceeded; BUDGET_HARD_KILL is not 'true', " +
+          "so billing was NOT disabled"
+        );
+      }
+    }
+  }
+);
+
+/**
+ * Detach the billing account from this project. This stops ALL paid
+ * services, so it is opt-in via BUDGET_HARD_KILL. Requires the function's
+ * service account to have Billing Project Manager on the project and
+ * permission to unlink billing (see docs/COST_CONTROLS.md).
+ * @return {Promise<void>}
+ */
+async function disableProjectBilling(): Promise<void> {
+  const auth = new GoogleAuth({
+    scopes: ["https://www.googleapis.com/auth/cloud-billing"],
+  });
+  const client = await auth.getClient();
+  const name = `projects/${PROJECT_ID}`;
+  const info = await client.request<{billingEnabled?: boolean}>({
+    url: `https://cloudbilling.googleapis.com/v1/${name}/billingInfo`,
+  });
+  if (!info.data.billingEnabled) {
+    console.log("budgetGuard: billing already disabled");
+    return;
+  }
+  await client.request({
+    url: `https://cloudbilling.googleapis.com/v1/${name}/billingInfo`,
+    method: "PUT",
+    data: {billingAccountName: ""},
+  });
+  console.error("budgetGuard: BILLING DISABLED for", name);
 }
