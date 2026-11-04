@@ -92,3 +92,22 @@ Thumbs.db
 
 # Rules test deps
 tests/rules/node_modules/
+
+# Firebase project alias (copy .firebaserc.example and run `firebase use --add`)
+.firebaserc
+.runtimeconfig.json
+functions/lib/
+
+# Credentials — never commit
+*.p12
+*.pem
+**/serviceAccount*.json
+**/*-key.json
+
+# Function env/config files (may hold project-specific settings)
+.env.*
+!.env.example
+functions/.env*
+
+# Keep the release source set (the generic "release/" rule above would hide it)
+!app/src/release/
