@@ -89,3 +89,6 @@ lint/tmp/
 # OS-specific files
 .DS_Store
 Thumbs.db
+
+# Rules test deps
+tests/rules/node_modules/

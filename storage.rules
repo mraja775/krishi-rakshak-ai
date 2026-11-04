@@ -1,36 +1,40 @@
 rules_version = '2';
+
+// NOTE: Cloud Functions use the Admin SDK, which BYPASSES these rules.
+// Never add `request.auth == null` clauses — that opens the bucket to the public.
 service firebase.storage {
   match /b/{bucket}/o {
 
-    // Images folder
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    // Uploaded plant photos: images/{userId}/{filename}
     match /images/{userId}/{filename} {
-      // Users can upload images to their own folder
-      allow write: if request.auth != null &&
-                      request.auth.uid == userId;
+      allow read: if isOwner(userId);
 
-      // Users can read their own images
-      allow read: if request.auth != null &&
-                     request.auth.uid == userId;
+      // Upload: images only, max 5 MB, no overwriting existing files.
+      allow create: if isOwner(userId)
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/(jpeg|png|webp)')
+        && filename.matches('[A-Za-z0-9_.-]{1,200}');
+
+      allow update: if false;
+      allow delete: if isOwner(userId);
     }
 
-    // Analysis results folder (for Cloud Functions)
+    // Written only by Cloud Functions (Admin SDK).
     match /analysis-results/{userId}/{filename} {
-      // Users can read their own analysis results
-      allow read: if request.auth != null &&
-                     request.auth.uid == userId;
-
-      // Cloud Functions can write analysis results
-      allow write: if request.auth == null;
+      allow read: if isOwner(userId);
+      allow write: if false;
     }
 
-    // Public assets folder (for app resources)
+    // App assets, managed by admins.
     match /public/{filename} {
-      // All authenticated users can read public assets
       allow read: if request.auth != null;
-      
-      // Only Cloud Functions can write public assets
-      allow write: if request.auth == null;
+      allow write: if false;
     }
+
+    // Everything else is denied by default.
   }
 }
-

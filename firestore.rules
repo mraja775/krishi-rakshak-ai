@@ -1,67 +1,89 @@
 rules_version = '2';
+
+// NOTE: Cloud Functions use the Admin SDK, which BYPASSES these rules.
+// Never add `request.auth == null` clauses "for Cloud Functions" — that
+// grants access to unauthenticated internet clients, not to the backend.
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Analyses collection
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    // Client clock may drift; accept timestamps within ±10 minutes of server time.
+    function isRecentMillis(t) {
+      return t is int
+        && t > request.time.toMillis() - 600000
+        && t < request.time.toMillis() + 600000;
+    }
+
+    // ---------------- analyses ----------------
+    // Created by the app as PENDING; only the Cloud Function (Admin SDK)
+    // may move it to PROCESSING / COMPLETED / FAILED and write results.
     match /analyses/{analysisId} {
-      // Users can read their own analyses
-      allow read: if request.auth != null &&
-                     resource.data.userId == request.auth.uid;
+      allow read: if signedIn() && resource.data.userId == request.auth.uid;
 
-      // Users can create their own analyses
-      allow create: if request.auth != null &&
-                       request.resource.data.userId == request.auth.uid;
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly([
+             'id', 'userId', 'imageUrl', 'plantType', 'confidence',
+             'recommendations', 'timestamp', 'status'])
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.id == analysisId
+        && request.resource.data.status == 'PENDING'
+        && request.resource.data.imageUrl is string
+        && request.resource.data.imageUrl.size() < 2048
+        // Image must live in this user's own Storage folder.
+        && request.resource.data.imageUrl.matches(
+             '^https://firebasestorage\\.googleapis\\.com/v0/b/[^/]+/o/images%2F'
+             + request.auth.uid + '%2F.*')
+        && request.resource.data.plantType == null
+        && request.resource.data.confidence == 0
+        && request.resource.data.recommendations.size() == 0
+        && isRecentMillis(request.resource.data.timestamp);
 
-      // Cloud Functions can update any analysis
-      allow update: if request.auth == null; // Cloud Function has no auth
+      // Clients may never modify results.
+      allow update: if false;
 
-      // Users can delete their own analyses
-      allow delete: if request.auth != null &&
-                       resource.data.userId == request.auth.uid;
+      allow delete: if signedIn() && resource.data.userId == request.auth.uid;
     }
 
-    // Users collection
+    // ---------------- users ----------------
     match /users/{userId} {
-      // Users can read and write their own data
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-      
-      // Cloud Functions can read and write any user data
-      allow read, write: if request.auth == null;
+      allow read, delete: if isOwner(userId);
+
+      allow create, update: if isOwner(userId)
+        && request.resource.data.keys().hasOnly(
+             ['phoneNumber', 'name', 'createdAt', 'lastLogin'])
+        // Phone number must be the verified one from Firebase Auth.
+        && request.resource.data.phoneNumber == request.auth.token.phone_number
+        && (request.resource.data.name == null
+            || (request.resource.data.name is string
+                && request.resource.data.name.size() <= 100))
+        && request.resource.data.createdAt is int
+        && request.resource.data.lastLogin is int;
     }
 
-    // Crops collection
+    // ---------------- reference data (read-only) ----------------
+    // Managed by admins / Cloud Functions via the Admin SDK only.
     match /crops/{cropId} {
-      // All authenticated users can read crops
-      allow read: if request.auth != null;
-      
-      // Users can create crops
-      allow create: if request.auth != null;
-      
-      // Cloud Functions can update any crop
-      allow update: if request.auth == null;
-      
-      // Users can delete their own crops
-      allow delete: if request.auth != null &&
-                       resource.data.userId == request.auth.uid;
+      allow read: if signedIn();
+      allow write: if false;
     }
 
-    // Diseases collection
     match /diseases/{diseaseId} {
-      // All authenticated users can read diseases
-      allow read: if request.auth != null;
-      
-      // Cloud Functions can create and update diseases
-      allow create, update: if request.auth == null;
+      allow read: if signedIn();
+      allow write: if false;
     }
 
-    // Treatments collection
     match /treatments/{treatmentId} {
-      // All authenticated users can read treatments
-      allow read: if request.auth != null;
-      
-      // Cloud Functions can create and update treatments
-      allow create, update: if request.auth == null;
+      allow read: if signedIn();
+      allow write: if false;
     }
+
+    // Everything else is denied by default.
   }
 }
-
