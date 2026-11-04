@@ -93,6 +93,9 @@ dependencies {
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.storage.ktx)
     implementation(libs.firebase.analytics.ktx)
+    // App Check: Play Integrity in release, debug provider only in debug builds
+    implementation(libs.firebase.appcheck.playintegrity)
+    debugImplementation(libs.firebase.appcheck.debug)
     // Crashlytics temporarily disabled - will add plugin in later phase
     // implementation(libs.firebase.crashlytics.ktx)
     implementation(libs.play.services.auth)
