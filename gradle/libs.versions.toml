@@ -7,7 +7,7 @@ targetSdk = "34"
 # Kotlin & AGP
 kotlin = "1.9.22"
 agp = "8.2.2"
-ksp = "1.9.22-1.0.17"
+ksp = "2.3.13"
 
 # Compose
 composeBom = "2024.02.00"
