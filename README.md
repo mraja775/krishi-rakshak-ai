@@ -31,13 +31,13 @@ sequenceDiagram
     participant Auth as Firebase Auth
     participant GCS as Cloud Storage
     participant FS as Firestore
-    participant Fn as analyzeImage (Cloud Function)
+    participant Fn as analyzePlantImage (Cloud Function)
     participant AI as Vertex AI Gemini
 
     App->>Auth: Phone OTP sign-in
     App->>GCS: Upload images/{uid}/{file}.jpg
     App->>FS: Create analyses/{id} (status PENDING)
-    GCS-->>Fn: object finalized trigger
+    FS-->>Fn: document created trigger
     Fn->>FS: Checks: type/size, per-user rate limit, kill switch, daily cap
     Fn->>AI: Image + diagnosis prompt
     AI-->>Fn: JSON result

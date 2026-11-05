@@ -11,7 +11,7 @@ app/                     Android app (Kotlin, Compose)
     di/                  Hilt modules (Firebase, Room, network, storage)
     util/                Image compression, language, network monitor, Result type
   src/debug/, src/release/   Build-type-specific App Check provider
-functions/               Cloud Functions (TypeScript): analyzeImage, budgetGuard
+functions/               Cloud Functions (TypeScript): analyzePlantImage, budgetGuard
 firestore.rules          Firestore security rules
 storage.rules            Cloud Storage security rules
 firestore.indexes.json   Composite indexes used by the functions
@@ -36,9 +36,9 @@ The app follows MVVM with clean-architecture layering:
 1. **Capture.** The camera or photo picker produces a local file. `ImageCompressor` resizes it and re-encodes it as JPEG.
 2. **Upload.** The file goes to `images/{uid}/…`. Storage rules allow only the owner, only `image/(jpeg|png|webp)`, under 5 MB, and no overwrites.
 3. **Create the record.** The app writes `analyses/{id}` with `status: PENDING`, empty results and the download URL. Firestore rules only accept this exact shape, and the URL must point into the caller's own folder.
-4. **Trigger.** `analyzeImage` runs on `storage.object.finalized`:
-   1. It finds the matching PENDING doc. It retries briefly, because the client creates the doc after the upload finishes.
-   2. It rejects unsupported types and files over 5 MB, deletes the object and marks the doc FAILED.
+4. **Trigger.** `analyzePlantImage` runs when the `analyses/{id}` doc is created. The app only creates the doc after the upload has finished, so the image is always there. (Triggering on the upload instead raced the doc creation.)
+   1. It claims the doc in a transaction (PENDING → PROCESSING), so a redelivered event can't cause a second Gemini call.
+   2. It re-checks that `imageUrl` points at `images/{userId}/…` in this project's bucket, then rejects unsupported types and files over 5 MB, deletes the object and marks the doc FAILED.
    3. **Per-user rate limit:** at most 20 analyses per hour. This is a `count()` query on `userId` and `timestamp`.
    4. **Kill switch:** if `_system/config.aiEnabled == false`, the analysis is marked FAILED.
    5. **Global daily cap:** a transaction on `_system/usage_<YYYYMMDD>`. The default is 500 per UTC day.

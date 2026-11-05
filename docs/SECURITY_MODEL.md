@@ -38,7 +38,7 @@ The comment reflects a common misunderstanding. **Cloud Functions use the Admin 
 
 ## Backend hardening
 
-- `analyzeImage` only ever changes the analysis doc it's processing (the error path included).
+- `analyzePlantImage` only ever changes the analysis doc it's processing (the error path included).
 - The upload type and size are checked again server-side before the image is downloaded.
 - Model output is untrusted. `sanitizeResult` enforces types, enums and length limits before anything is stored.
 - Logs avoid user IDs, storage paths and full model responses.

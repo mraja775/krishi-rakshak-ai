@@ -8,11 +8,11 @@ The backend spends money in four places: **Gemini calls** (the main variable cos
 
 | Guard | Where | Default | Change via |
 |-------|-------|---------|------------|
-| Upload type/size limit | `storage.rules` + `analyzeImage` | JPEG/PNG/WebP, < 5 MB | edit rules / `MAX_IMAGE_BYTES` |
-| Per-user rate limit | `analyzeImage` | 20 analyses / user / hour | `RATE_LIMIT_MAX_ANALYSES` |
-| **Global daily cap** | `analyzeImage` → `_system/usage_<YYYYMMDD>` | 500 Gemini calls / UTC day | env `GLOBAL_DAILY_MAX_ANALYSES` |
-| **Kill switch** | `analyzeImage` reads `_system/config.aiEnabled` (cached for 60 s) | enabled | set `aiEnabled: false` |
-| Function scaling cap | `analyzeImage` options | max 10 instances, 1 GiB, 120 s timeout | `maxInstances` etc. |
+| Upload type/size limit | `storage.rules` + `analyzePlantImage` | JPEG/PNG/WebP, < 5 MB | edit rules / `MAX_IMAGE_BYTES` |
+| Per-user rate limit | `analyzePlantImage` | 20 analyses / user / hour | `RATE_LIMIT_MAX_ANALYSES` |
+| **Global daily cap** | `analyzePlantImage` → `_system/usage_<YYYYMMDD>` | 500 Gemini calls / UTC day | env `GLOBAL_DAILY_MAX_ANALYSES` |
+| **Kill switch** | `analyzePlantImage` reads `_system/config.aiEnabled` (cached for 60 s) | enabled | set `aiEnabled: false` |
+| Function scaling cap | `analyzePlantImage` options | max 10 instances, 1 GiB, 120 s timeout | `maxInstances` etc. |
 | **Budget guard** | `budgetGuard` (Pub/Sub) | soft kill at 80 %; hard kill off | env `BUDGET_HARD_KILL` |
 | Output size limits | `sanitizeResult` | capped strings and lists | constants in `index.ts` |
 

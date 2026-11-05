@@ -1,4 +1,4 @@
-import {onObjectFinalized} from "firebase-functions/v2/storage";
+import {onDocumentCreated} from "firebase-functions/v2/firestore";
 import {onMessagePublished} from "firebase-functions/v2/pubsub";
 import {GoogleAuth} from "google-auth-library";
 import * as admin from "firebase-admin";
@@ -46,59 +46,75 @@ const DEFAULT_SEVERITY = "MODERATE";
 
 type AnalysisRef = FirebaseFirestore.DocumentReference;
 
+// Stale PENDING docs older than this are marked FAILED when the same user
+// starts a new analysis (e.g. the app was killed mid-upload).
+const STALE_PENDING_MS = 5 * 60 * 1000;
+// Upload filenames the Storage rules allow.
+const SAFE_FILENAME = /^[A-Za-z0-9_.-]{1,200}$/;
+
 /**
- * Cloud Function triggered when image is uploaded to Storage
- * Analyzes plant image using Vertex AI Gemini
+ * Runs when the app creates a PENDING analysis doc. The app only creates
+ * the doc after the image upload has finished, so the image is always
+ * there. (The old Storage trigger raced the doc creation and sometimes
+ * gave up before the doc existed, leaving the app stuck on "analyzing".)
  */
-export const analyzeImage = onObjectFinalized(
+export const analyzePlantImage = onDocumentCreated(
   {
+    document: "analyses/{analysisId}",
     timeoutSeconds: 120,
     memory: "1GiB",
     maxInstances: 10,
     region: LOCATION,
   },
   async (event) => {
-    const filePath = event.data.name;
-    const bucket = event.data.bucket;
-
-    // Only process images in the 'images/' folder
-    if (!filePath || !filePath.startsWith("images/")) {
-      console.log("Skipping file outside images/");
-      return;
-    }
-
-    // Extract userId from path: images/{userId}/{filename}
-    const pathParts = filePath.split("/");
-    if (pathParts.length < 3) {
-      console.error("Invalid file path structure");
-      return;
-    }
-    const userId = pathParts[1];
-
-    // The specific analysis doc this invocation owns. Only this doc is
-    // ever marked FAILED by the error handler.
-    let analysisRef: AnalysisRef | null = null;
+    const snap = event.data;
+    if (!snap) return;
+    const analysisRef: AnalysisRef = snap.ref;
+    const data = snap.data();
 
     try {
-      analysisRef = await findAnalysisDoc(bucket, filePath, userId);
-      if (!analysisRef) {
-        console.log("No recent pending analysis found; skipping");
+      // Triggers are at-least-once: claim the doc so a redelivered event
+      // can never pay for a second Gemini call.
+      if (!(await claimPending(analysisRef))) {
+        console.log("Analysis not PENDING (duplicate event?):", snap.id);
         return;
       }
-      console.log("Processing analysis:", analysisRef.id);
+      console.log("Processing analysis:", snap.id);
+
+      const userId = data.userId;
+      if (typeof userId !== "string" || userId.length === 0) {
+        await markFailed(analysisRef, "Invalid analysis");
+        return;
+      }
+
+      // The rules already check this, but never trust a client-written URL.
+      const image = parseOwnImageUrl(data.imageUrl, userId);
+      if (!image) {
+        await markFailed(analysisRef, "Invalid image reference");
+        return;
+      }
+
+      await expireStalePending(userId, analysisRef.id);
 
       // Validate type and size before downloading anything
-      const contentType = event.data.contentType || "";
-      const size = Number(event.data.size) || 0;
+      const file = storage.bucket(image.bucket).file(image.path);
+      const [exists] = await file.exists();
+      if (!exists) {
+        await markFailed(analysisRef, "Image not found");
+        return;
+      }
+      const [metadata] = await file.getMetadata();
+      const contentType = metadata.contentType || "";
+      const size = Number(metadata.size) || 0;
       if (!ALLOWED_CONTENT_TYPES.includes(contentType)) {
         await rejectUpload(
-          analysisRef, bucket, filePath, "Unsupported image type"
+          analysisRef, image.bucket, image.path, "Unsupported image type"
         );
         return;
       }
       if (size > MAX_IMAGE_BYTES) {
         await rejectUpload(
-          analysisRef, bucket, filePath, "Image too large (max 5 MB)"
+          analysisRef, image.bucket, image.path, "Image too large (max 5 MB)"
         );
         return;
       }
@@ -134,95 +150,112 @@ export const analyzeImage = onObjectFinalized(
         return;
       }
 
-      await processAnalysis(analysisRef, bucket, filePath, contentType);
+      await processAnalysis(analysisRef, image.bucket, image.path, contentType);
       console.log("Analysis completed successfully:", analysisRef.id);
     } catch (error) {
       console.error("Error analyzing image:", error);
-      if (analysisRef) {
-        await markFailed(
-          analysisRef,
-          error instanceof Error ? error.message : "Unknown error"
-        ).catch((e) => console.error("Failed to mark analysis FAILED:", e));
-      }
+      await markFailed(
+        analysisRef,
+        error instanceof Error ? error.message : "Unknown error"
+      ).catch((e) => console.error("Failed to mark analysis FAILED:", e));
     }
   }
 );
 
 /**
- * Locate the PENDING analysis doc for this upload. Retries briefly because
- * the client creates the doc after upload; falls back to the user's most
- * recent PENDING doc. Also expires the user's stale PENDING docs.
- * @param {string} bucket - Storage bucket name
- * @param {string} filePath - Object path
- * @param {string} userId - Owner uid from the path
- * @return {Promise<AnalysisRef | null>} matching doc ref, or null
+ * Atomically move the doc from PENDING to PROCESSING.
+ * @param {AnalysisRef} ref - Analysis doc
+ * @return {Promise<boolean>} true if this invocation claimed it
  */
-async function findAnalysisDoc(
-  bucket: string,
-  filePath: string,
+async function claimPending(ref: AnalysisRef): Promise<boolean> {
+  return firestore.runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    if (!snap.exists || snap.get("status") !== "PENDING") return false;
+    tx.update(ref, {status: "PROCESSING"});
+    return true;
+  });
+}
+
+/**
+ * Parse a Firebase Storage download URL and accept it only if it points
+ * at images/{userId}/{file} in this project's default bucket.
+ * @param {unknown} imageUrl - URL written by the client
+ * @param {string} userId - Owner of the analysis
+ * @return {{bucket: string, path: string} | null} object location or null
+ */
+export function parseOwnImageUrl(
+  imageUrl: unknown,
   userId: string
-): Promise<AnalysisRef | null> {
-  const baseImageUrl = "https://firebasestorage.googleapis.com/v0/b/" +
-    `${bucket}/o/${encodeURIComponent(filePath)}?alt=media`;
+): {bucket: string, path: string} | null {
+  if (typeof imageUrl !== "string" || imageUrl.length > 2048) return null;
+  let url: URL;
+  try {
+    url = new URL(imageUrl);
+  } catch {
+    return null;
+  }
+  if (url.protocol !== "https:" ||
+      url.hostname !== "firebasestorage.googleapis.com") {
+    return null;
+  }
+  const m = url.pathname.match(/^\/v0\/b\/([^/]+)\/o\/([^/]+)$/);
+  if (!m) return null;
+  const bucket = m[1];
+  let path: string;
+  try {
+    path = decodeURIComponent(m[2]);
+  } catch {
+    return null;
+  }
+  if (bucket !== defaultBucket()) return null;
+  const parts = path.split("/");
+  if (parts.length !== 3 || parts[0] !== "images" || parts[1] !== userId ||
+      !SAFE_FILENAME.test(parts[2]) || parts[2].includes("..")) {
+    return null;
+  }
+  return {bucket, path};
+}
 
-  const maxRetries = 3;
-  for (let attempt = 0; attempt < maxRetries; attempt++) {
-    if (attempt > 0) {
-      // Wait before retrying (500ms, 1000ms)
-      await new Promise((resolve) => setTimeout(resolve, 500 * attempt));
-    }
+/**
+ * This project's default Storage bucket name.
+ * @return {string} bucket name
+ */
+function defaultBucket(): string {
+  return process.env.STORAGE_BUCKET_OVERRIDE || admin.storage().bucket().name;
+}
 
-    const twoMinutesAgo = Date.now() - (2 * 60 * 1000);
-    const pending = await firestore
+/**
+ * Best-effort: mark this user's other PENDING docs older than
+ * STALE_PENDING_MS as FAILED so the app stops waiting on them.
+ * @param {string} userId - Owner uid
+ * @param {string} currentId - The analysis being processed now
+ * @return {Promise<void>}
+ */
+async function expireStalePending(
+  userId: string,
+  currentId: string
+): Promise<void> {
+  try {
+    const stale = await firestore
       .collection("analyses")
       .where("userId", "==", userId)
       .where("status", "==", "PENDING")
-      .where("timestamp", ">", twoMinutesAgo)
+      .where("timestamp", "<", Date.now() - STALE_PENDING_MS)
       .orderBy("timestamp", "desc")
+      .limit(20)
       .get();
-
-    const match = pending.docs.find((doc) => {
-      const url = doc.data().imageUrl;
-      return typeof url === "string" && url.startsWith(baseImageUrl);
-    });
-
-    if (match) {
-      // Clean up this user's OTHER old pending analyses
-      const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);
-      const oldDocs = pending.docs.filter((d) => {
-        return d.id !== match.id && d.data().timestamp < fiveMinutesAgo;
-      });
-      if (oldDocs.length > 0) {
-        console.log(`Cleaning up ${oldDocs.length} old analyses`);
-        const batch = firestore.batch();
-        oldDocs.forEach((oldDoc) => {
-          batch.update(oldDoc.ref, {
-            status: "FAILED",
-            error: "Timeout - no processing after 5 minutes",
-          });
-        });
-        await batch.commit();
-      }
-      return match.ref;
-    }
+    const docs = stale.docs.filter((d) => d.id !== currentId);
+    if (docs.length === 0) return;
+    console.log(`Expiring ${docs.length} stale pending analyses`);
+    const batch = firestore.batch();
+    docs.forEach((d) => batch.update(d.ref, {
+      status: "FAILED",
+      error: "Timed out - please try again",
+    }));
+    await batch.commit();
+  } catch (e) {
+    console.warn("Could not expire stale pending analyses:", e);
   }
-
-  // Fallback: most recent PENDING doc for this user in the last 5 minutes
-  const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);
-  const fallback = await firestore
-    .collection("analyses")
-    .where("userId", "==", userId)
-    .where("status", "==", "PENDING")
-    .where("timestamp", ">", fiveMinutesAgo)
-    .orderBy("timestamp", "desc")
-    .limit(1)
-    .get();
-
-  if (fallback.empty) {
-    return null;
-  }
-  console.log("Using fallback analysis:", fallback.docs[0].id);
-  return fallback.docs[0].ref;
 }
 
 /**
@@ -239,8 +272,6 @@ async function processAnalysis(
   filePath: string,
   contentType: string
 ): Promise<void> {
-  await ref.update({status: "PROCESSING"});
-
   const [imageBuffer] = await storage.bucket(bucket).file(filePath).download();
   const aiResult = await analyzeWithGemini(
     imageBuffer.toString("base64"),
