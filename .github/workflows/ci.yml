@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Least privilege: CI only needs to read the code. No secrets are used.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android:
+    name: Android build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Use placeholder Firebase config
+        # The real google-services.json is never committed; the template holds
+        # placeholder values that satisfy the google-services Gradle plugin.
+        run: cp app/google-services.json.template app/google-services.json
+      - name: Assemble debug APK
+        run: ./gradlew assembleDebug --console=plain
+
+  functions:
+    name: Cloud Functions lint & build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: functions
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: functions/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+
+  rules:
+    name: Security rules tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: tests/rules/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Install test dependencies
+        working-directory: tests/rules
+        run: npm ci
+      - name: Run rules tests in the Firebase emulator
+        # demo-* project IDs never touch real Firebase resources.
+        run: >
+          npx --yes firebase-tools@14 emulators:exec
+          --only firestore,storage --project demo-krishi-rakshak
+          "cd tests/rules && node --test"
