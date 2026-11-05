@@ -25,7 +25,7 @@ jobs:
         with:
           distribution: temurin
           java-version: "17"
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6
       - name: Use placeholder Firebase config
         # The real google-services.json is never committed; the template holds
         # placeholder values that satisfy the google-services Gradle plugin.
