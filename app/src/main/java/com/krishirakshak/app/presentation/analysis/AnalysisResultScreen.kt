@@ -9,8 +9,10 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.krishirakshak.app.R
 import com.krishirakshak.app.domain.entity.DiseaseSeverity
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,10 +32,10 @@ fun AnalysisResultScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Analysis Result") },
+                title = { Text(stringResource(R.string.analysis_result)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -59,7 +61,7 @@ fun AnalysisResultScreen(
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Text(
-                                    text = "🌱 Plant Identified",
+                                    text = "🌱 " + stringResource(R.string.plant_identified),
                                     style = MaterialTheme.typography.titleMedium,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer
                                 )
@@ -89,7 +91,7 @@ fun AnalysisResultScreen(
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Text(
-                                    text = "🦠 Disease Detected",
+                                    text = "🦠 " + stringResource(R.string.disease_detected),
                                     style = MaterialTheme.typography.titleMedium
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
@@ -107,7 +109,7 @@ fun AnalysisResultScreen(
                                 Spacer(modifier = Modifier.height(8.dp))
                                 SuggestionChip(
                                     onClick = { },
-                                    label = { Text("Severity: ${disease.severity.name}") }
+                                    label = { Text(stringResource(R.string.severity_label, stringResource(severityLabel(disease.severity)))) }
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
@@ -138,12 +140,12 @@ fun AnalysisResultScreen(
                                 Spacer(modifier = Modifier.width(16.dp))
                                 Column {
                                     Text(
-                                        text = "Healthy Plant! ✨",
+                                        text = stringResource(R.string.healthy_plant) + " ✨",
                                         style = MaterialTheme.typography.headlineSmall,
                                         color = MaterialTheme.colorScheme.tertiary
                                     )
                                     Text(
-                                        text = "No diseases detected",
+                                        text = stringResource(R.string.no_diseases_detected),
                                         style = MaterialTheme.typography.bodyMedium
                                     )
                                 }
@@ -156,7 +158,7 @@ fun AnalysisResultScreen(
                     Card(modifier = Modifier.fillMaxWidth()) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
-                                text = "Confidence",
+                                text = stringResource(R.string.confidence),
                                 style = MaterialTheme.typography.titleMedium
                             )
                             Spacer(modifier = Modifier.height(8.dp))
@@ -180,7 +182,7 @@ fun AnalysisResultScreen(
                         Card(modifier = Modifier.fillMaxWidth()) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Text(
-                                    text = "💡 Recommendations",
+                                    text = "💡 " + stringResource(R.string.recommendations),
                                     style = MaterialTheme.typography.titleMedium
                                 )
                                 Spacer(modifier = Modifier.height(12.dp))
@@ -207,7 +209,7 @@ fun AnalysisResultScreen(
                         onClick = onNavigateToHistory,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("View History")
+                        Text(stringResource(R.string.view_history))
                     }
                 }
             }
@@ -232,12 +234,12 @@ fun AnalysisResultScreen(
                         .padding(16.dp)
                 ) {
                     Text(
-                        text = "Error loading analysis",
+                        text = stringResource(R.string.error_loading_analysis),
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.error
                     )
                     Text(
-                        text = state.message,
+                        text = stringResource(analysisErrorMessage(state.error)),
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -245,4 +247,12 @@ fun AnalysisResultScreen(
             else -> {}
         }
     }
+}
+
+/** Translated label for each severity level. */
+private fun severityLabel(severity: DiseaseSeverity): Int = when (severity) {
+    DiseaseSeverity.LOW -> R.string.severity_low
+    DiseaseSeverity.MODERATE -> R.string.severity_medium
+    DiseaseSeverity.SEVERE -> R.string.severity_high
+    DiseaseSeverity.CRITICAL -> R.string.severity_critical
 }

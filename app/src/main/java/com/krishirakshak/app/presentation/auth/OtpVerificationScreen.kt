@@ -8,9 +8,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.krishirakshak.app.R
 import kotlinx.coroutines.delay
 
 @Composable
@@ -49,14 +51,14 @@ fun OtpVerificationScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Verify OTP",
+            text = stringResource(R.string.verify_otp_title),
             style = MaterialTheme.typography.headlineSmall
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Enter the 6-digit code sent to",
+            text = stringResource(R.string.otp_sent_to),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -72,7 +74,7 @@ fun OtpVerificationScreen(
         OutlinedTextField(
             value = otpCode,
             onValueChange = { if (it.length <= 6) viewModel.updateOtpCode(it) },
-            label = { Text("OTP Code") },
+            label = { Text(stringResource(R.string.otp_label)) },
             placeholder = { Text("000000") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
             singleLine = true,
@@ -94,7 +96,7 @@ fun OtpVerificationScreen(
                     modifier = Modifier.size(20.dp)
                 )
             } else {
-                Text("Verify")
+                Text(stringResource(R.string.verify_otp))
             }
         }
 
@@ -108,8 +110,8 @@ fun OtpVerificationScreen(
             enabled = resendTimer == 0 && uiState !is AuthUiState.Loading
         ) {
             Text(
-                if (resendTimer > 0) "Resend OTP in ${resendTimer}s"
-                else "Resend OTP"
+                if (resendTimer > 0) stringResource(R.string.resend_otp_in, resendTimer)
+                else stringResource(R.string.resend_otp)
             )
         }
 

@@ -4,13 +4,16 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.krishirakshak.app.R
 import com.krishirakshak.app.presentation.auth.AuthViewModel
 
 @Composable
@@ -26,20 +29,20 @@ fun HomeScreen(
         bottomBar = {
             NavigationBar {
                 NavigationBarItem(
-                    icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
-                    label = { Text("Home") },
+                    icon = { Icon(Icons.Filled.Home, contentDescription = stringResource(R.string.nav_home)) },
+                    label = { Text(stringResource(R.string.nav_home)) },
                     selected = true,
                     onClick = { }
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Filled.Add, contentDescription = "History") },
-                    label = { Text("History") },
+                    icon = { Icon(Icons.Filled.List, contentDescription = stringResource(R.string.nav_history)) },
+                    label = { Text(stringResource(R.string.nav_history)) },
                     selected = false,
                     onClick = onNavigateToHistory
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Filled.Person, contentDescription = "Profile") },
-                    label = { Text("Profile") },
+                    icon = { Icon(Icons.Filled.Person, contentDescription = stringResource(R.string.nav_profile)) },
+                    label = { Text(stringResource(R.string.nav_profile)) },
                     selected = false,
                     onClick = onNavigateToProfile
                 )
@@ -62,7 +65,7 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Welcome!",
+                text = stringResource(R.string.welcome),
                 style = MaterialTheme.typography.headlineMedium
             )
 
@@ -84,13 +87,13 @@ fun HomeScreen(
             ) {
                 Icon(Icons.Filled.Add, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Analyze Plant", style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.analyze_plant), style = MaterialTheme.typography.titleMedium)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Take a photo of your plant to detect diseases",
+                text = stringResource(R.string.take_photo_instruction),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

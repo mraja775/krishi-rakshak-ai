@@ -111,4 +111,37 @@
     <string name="close">ಮುಚ್ಚಿ</string>
     <string name="save">ಉಳಿಸಿ</string>
     <string name="loading">ಲೋಡ್ ಆಗುತ್ತಿದೆ…</string>
+    <string name="error_upload_message">ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ನಿಮ್ಮ ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕವನ್ನು ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.</string>
+    <string name="error_timeout_message">ಇದಕ್ಕೆ ತುಂಬಾ ಸಮಯ ಹಿಡಿಯುತ್ತಿದೆ. ನಿಮ್ಮ ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕವನ್ನು ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.</string>
+    <string name="error_rate_limit_message">ನೀವು ಗಂಟೆಗೆ 20 ವಿಶ್ಲೇಷಣೆಗಳ ಮಿತಿಯನ್ನು ತಲುಪಿದ್ದೀರಿ. ದಯವಿಟ್ಟು ನಂತರ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.</string>
+    <string name="error_service_busy_message">ಸೇವೆ ಈಗ ಕಾರ್ಯನಿರತವಾಗಿದೆ. ದಯವಿಟ್ಟು ನಂತರ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.</string>
+    <string name="error_generic_message">ಈ ಫೋಟೋವನ್ನು ವಿಶ್ಲೇಷಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ಎಲೆಯ ಸ್ಪಷ್ಟ, ಹತ್ತಿರದ ಫೋಟೋದೊಂದಿಗೆ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.</string>
+    <string name="try_again">ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ</string>
+    <string name="back_to_home">ಮುಖಪುಟಕ್ಕೆ ಹಿಂತಿರುಗಿ</string>
+
+    <!-- Screen text (localized UI chrome) -->
+    <string name="app_tagline">ಸಸ್ಯ ರೋಗ ಪತ್ತೆ</string>
+    <string name="welcome_to_app">ಕೃಷಿ ರಕ್ಷಕ್‌ಗೆ ಸ್ವಾಗತ</string>
+    <string name="phone_enter_to_continue">ಮುಂದುವರಿಯಲು ನಿಮ್ಮ ಮೊಬೈಲ್ ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ</string>
+    <string name="error_invalid_mobile_10_digit">ದಯವಿಟ್ಟು ಸರಿಯಾದ 10 ಅಂಕಿಯ ಮೊಬೈಲ್ ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ</string>
+    <string name="verify_otp_title">OTP ಪರಿಶೀಲಿಸಿ</string>
+    <string name="otp_sent_to">ಈ ಸಂಖ್ಯೆಗೆ ಕಳುಹಿಸಲಾದ 6 ಅಂಕಿಯ ಕೋಡ್ ನಮೂದಿಸಿ</string>
+    <string name="resend_otp_in">%1$d ಸೆಕೆಂಡುಗಳಲ್ಲಿ OTP ಮರು ಕಳುಹಿಸಿ</string>
+    <string name="capture_plant_image">ಸಸ್ಯದ ಫೋಟೋ ತೆಗೆಯಿರಿ</string>
+    <string name="camera_permission_required">ಕ್ಯಾಮೆರಾ ಅನುಮತಿ ಅಗತ್ಯವಿದೆ</string>
+    <string name="camera_permission_rationale">ರೋಗ ಪತ್ತೆಗಾಗಿ ಸಸ್ಯಗಳ ಫೋಟೋ ತೆಗೆಯಲು ಕ್ಯಾಮೆರಾ ಅನುಮತಿ ಅಗತ್ಯವಿದೆ.</string>
+    <string name="grant_permission">ಅನುಮತಿ ನೀಡಿ</string>
+    <string name="preview_image">ಫೋಟೋ ಮುನ್ನೋಟ</string>
+    <string name="captured_plant_image">ತೆಗೆದ ಸಸ್ಯದ ಫೋಟೋ</string>
+    <string name="optimizing_image">ಫೋಟೋ ಸಿದ್ಧಪಡಿಸಲಾಗುತ್ತಿದೆ…</string>
+    <string name="preparing">ಸಿದ್ಧಪಡಿಸಲಾಗುತ್ತಿದೆ…</string>
+    <string name="plant_identified">ಸಸ್ಯ ಗುರುತಿಸಲಾಗಿದೆ</string>
+    <string name="disease_detected">ರೋಗ ಪತ್ತೆಯಾಗಿದೆ</string>
+    <string name="severity_label">ತೀವ್ರತೆ: %1$s</string>
+    <string name="healthy_plant">ಆರೋಗ್ಯಕರ ಸಸ್ಯ!</string>
+    <string name="no_diseases_detected">ಯಾವುದೇ ರೋಗ ಪತ್ತೆಯಾಗಿಲ್ಲ</string>
+    <string name="error_loading_analysis">ವಿಶ್ಲೇಷಣೆಯನ್ನು ಲೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ</string>
+    <string name="plant_image">ಸಸ್ಯದ ಫೋಟೋ</string>
+    <string name="profile_user_label">ಕೃಷಿ ರಕ್ಷಕ್ ಬಳಕೆದಾರ</string>
+    <string name="selected">ಆಯ್ಕೆಮಾಡಲಾಗಿದೆ</string>
 </resources>

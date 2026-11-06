@@ -62,7 +62,9 @@ object FirebaseModule {
     fun provideFirebaseStorage(): FirebaseStorage {
         return Firebase.storage.apply {
             // Set maximum upload/download timeout (for slow connections)
-            maxUploadRetryTimeMillis = 120000 // 2 minutes
+            // Give up quickly so the user sees a clear "check your internet"
+            // message instead of a long spinner (photos are < 1 MB).
+            maxUploadRetryTimeMillis = 30000 // 30 seconds
             maxDownloadRetryTimeMillis = 120000
         }
     }

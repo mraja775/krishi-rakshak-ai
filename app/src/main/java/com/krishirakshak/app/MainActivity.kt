@@ -185,8 +185,7 @@ fun AppNavigation(onLanguageChanged: () -> Unit) {
                         popUpTo(Screen.Home.route)
                     }
                 },
-                onError = { errorMessage ->
-                    // On error, navigate back to home
+                onBackToHome = {
                     navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Home.route) { inclusive = true }
                     }

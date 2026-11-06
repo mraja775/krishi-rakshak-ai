@@ -124,7 +124,8 @@ class AnalysisRepositoryImpl @Inject constructor(
                                 timestamp = (data["timestamp"] as? Number)?.toLong() ?: 0L,
                                 status = AnalysisStatus.valueOf(
                                     data["status"] as? String ?: "PENDING"
-                                )
+                                ),
+                                errorMessage = data["error"] as? String
                             )
 
                             Timber.d("Firestore update received: ${analysis.id}, status: ${analysis.status}")

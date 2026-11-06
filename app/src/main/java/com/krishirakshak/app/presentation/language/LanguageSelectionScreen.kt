@@ -34,7 +34,7 @@ fun LanguageSelectionScreen(
                     title = { Text(stringResource(R.string.select_language)) },
                     navigationIcon = {
                         IconButton(onClick = { onNavigateBack?.invoke() }) {
-                            Icon(Icons.Default.Check, contentDescription = "Back")
+                            Icon(Icons.Default.Check, contentDescription = stringResource(R.string.back))
                         }
                     }
                 )
@@ -166,7 +166,7 @@ fun LanguageOption(
             if (isSelected) {
                 Icon(
                     imageVector = Icons.Default.Check,
-                    contentDescription = "Selected",
+                    contentDescription = stringResource(R.string.selected),
                     tint = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }

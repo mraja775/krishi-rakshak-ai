@@ -5,8 +5,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.krishirakshak.app.R
 import timber.log.Timber
 
 /**
@@ -16,7 +19,7 @@ import timber.log.Timber
 fun AnalysisLoadingScreen(
     compressedImagePath: String,
     onAnalysisComplete: (String) -> Unit,
-    onError: (String) -> Unit,
+    onBackToHome: () -> Unit,
     viewModel: AnalysisViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -35,8 +38,7 @@ fun AnalysisLoadingScreen(
                 onAnalysisComplete(state.analysis.id)
             }
             is AnalysisUiState.Error -> {
-                Timber.e("AnalysisLoadingScreen: Error: ${state.message}")
-                onError(state.message)
+                Timber.e("AnalysisLoadingScreen: Error: ${state.error}")
             }
             else -> {}
         }
@@ -54,9 +56,43 @@ fun AnalysisLoadingScreen(
             verticalArrangement = Arrangement.Center
         ) {
             when (val state = uiState) {
+                is AnalysisUiState.Error -> {
+                    Text(text = "⚠️", style = MaterialTheme.typography.displayMedium)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = stringResource(R.string.error_analysis_failed),
+                        style = MaterialTheme.typography.headlineSmall,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = stringResource(analysisErrorMessage(state.error)),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(32.dp))
+                    if (state.error != AnalysisError.RATE_LIMIT &&
+                        state.error != AnalysisError.SERVICE_BUSY
+                    ) {
+                        Button(
+                            onClick = { viewModel.retry() },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(stringResource(R.string.try_again))
+                        }
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
+                    OutlinedButton(
+                        onClick = onBackToHome,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(stringResource(R.string.back_to_home))
+                    }
+                }
                 is AnalysisUiState.Uploading -> {
                     Text(
-                        text = "Uploading Image...",
+                        text = stringResource(R.string.uploading_image),
                         style = MaterialTheme.typography.headlineSmall
                     )
                     Spacer(modifier = Modifier.height(24.dp))
@@ -81,12 +117,12 @@ fun AnalysisLoadingScreen(
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                     Text(
-                        text = "🤖 AI is analyzing your plant...",
+                        text = "🤖 " + stringResource(R.string.ai_analyzing),
                         style = MaterialTheme.typography.headlineSmall
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "This may take a few moments",
+                        text = stringResource(R.string.please_wait),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -98,11 +134,20 @@ fun AnalysisLoadingScreen(
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                     Text(
-                        text = "Preparing...",
+                        text = stringResource(R.string.preparing),
                         style = MaterialTheme.typography.headlineSmall
                     )
                 }
             }
         }
     }
+}
+
+/** Translated message for each failure reason. */
+fun analysisErrorMessage(error: AnalysisError): Int = when (error) {
+    AnalysisError.UPLOAD -> R.string.error_upload_message
+    AnalysisError.TIMEOUT -> R.string.error_timeout_message
+    AnalysisError.RATE_LIMIT -> R.string.error_rate_limit_message
+    AnalysisError.SERVICE_BUSY -> R.string.error_service_busy_message
+    AnalysisError.GENERIC -> R.string.error_generic_message
 }

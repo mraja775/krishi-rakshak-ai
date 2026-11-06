@@ -18,10 +18,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.krishirakshak.app.R
 import com.krishirakshak.app.util.PermissionHandler
 import timber.log.Timber
 import java.util.concurrent.Executor
@@ -90,10 +92,10 @@ fun CameraScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Capture Plant Image") },
+                title = { Text(stringResource(R.string.capture_plant_image)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -193,7 +195,7 @@ fun CameraScreen(
                         },
                         modifier = Modifier.width(200.dp)
                     ) {
-                        Text("Choose from Gallery")
+                        Text(stringResource(R.string.choose_from_gallery))
                     }
                 }
             } else {
@@ -206,12 +208,12 @@ fun CameraScreen(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Camera Permission Required",
+                        text = stringResource(R.string.camera_permission_required),
                         style = MaterialTheme.typography.titleLarge
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = PermissionHandler.getCameraRationale(),
+                        text = stringResource(R.string.camera_permission_rationale),
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Spacer(modifier = Modifier.height(24.dp))
@@ -220,7 +222,7 @@ fun CameraScreen(
                             cameraPermissionLauncher.launch(PermissionHandler.CAMERA_PERMISSION)
                         }
                     ) {
-                        Text("Grant Permission")
+                        Text(stringResource(R.string.grant_permission))
                     }
                 }
             }
