@@ -104,7 +104,15 @@ adb shell am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE -d file:
 
 ## 8. Release builds
 
-- Create an upload keystore (never commit it: `*.jks` and `*.keystore` are gitignored) and configure signing locally or in CI secrets.
+- Create an upload keystore outside the repo (never commit it: `*.jks` and `*.keystore` are gitignored), then add its details to your **user-level** `~/.gradle/gradle.properties` (not the project's):
+  ```properties
+  KRISHI_RELEASE_STORE_FILE=/absolute/path/to/release.jks
+  KRISHI_RELEASE_STORE_PASSWORD=...
+  KRISHI_RELEASE_KEY_ALIAS=...
+  KRISHI_RELEASE_KEY_PASSWORD=...
+  ```
+  `./gradlew assembleRelease` then signs the APK. Without these properties the release build is produced unsigned.
+- Back up the keystore and its password somewhere safe (e.g. a password manager). If you lose it you can't ship updates to an installed app.
 - Register the release SHA-1 and SHA-256 (or the Play App Signing ones) in Firebase.
 - Release builds attest with **Play Integrity**. Link your Play Console app to the Firebase project under App Check.
 

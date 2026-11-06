@@ -111,4 +111,37 @@
     <string name="close">बंद करें</string>
     <string name="save">सहेजें</string>
     <string name="loading">लोड हो रहा है…</string>
+    <string name="error_upload_message">फ़ोटो अपलोड नहीं हो सकी। अपना इंटरनेट कनेक्शन जाँचें और फिर से कोशिश करें।</string>
+    <string name="error_timeout_message">इसमें बहुत समय लग रहा है। अपना इंटरनेट कनेक्शन जाँचें और फिर से कोशिश करें।</string>
+    <string name="error_rate_limit_message">आप एक घंटे में 20 विश्लेषण की सीमा तक पहुँच गए हैं। कृपया बाद में फिर से कोशिश करें।</string>
+    <string name="error_service_busy_message">सेवा अभी व्यस्त है। कृपया बाद में फिर से कोशिश करें।</string>
+    <string name="error_generic_message">हम इस फ़ोटो का विश्लेषण नहीं कर सके। कृपया पत्ती की साफ़, नज़दीक से ली गई फ़ोटो के साथ फिर से कोशिश करें।</string>
+    <string name="try_again">फिर से कोशिश करें</string>
+    <string name="back_to_home">होम पर वापस जाएँ</string>
+
+    <!-- Screen text (localized UI chrome) -->
+    <string name="app_tagline">पौधों के रोग की पहचान</string>
+    <string name="welcome_to_app">कृषि रक्षक में आपका स्वागत है</string>
+    <string name="phone_enter_to_continue">आगे बढ़ने के लिए अपना मोबाइल नंबर डालें</string>
+    <string name="error_invalid_mobile_10_digit">कृपया सही 10 अंकों का मोबाइल नंबर डालें</string>
+    <string name="verify_otp_title">OTP सत्यापित करें</string>
+    <string name="otp_sent_to">इस नंबर पर भेजा गया 6 अंकों का कोड डालें</string>
+    <string name="resend_otp_in">%1$d सेकंड में OTP फिर से भेजें</string>
+    <string name="capture_plant_image">पौधे की फोटो लें</string>
+    <string name="camera_permission_required">कैमरा अनुमति ज़रूरी है</string>
+    <string name="camera_permission_rationale">रोग की जाँच के लिए पौधों की फोटो लेने हेतु कैमरा अनुमति ज़रूरी है।</string>
+    <string name="grant_permission">अनुमति दें</string>
+    <string name="preview_image">फोटो देखें</string>
+    <string name="captured_plant_image">ली गई पौधे की फोटो</string>
+    <string name="optimizing_image">फोटो तैयार की जा रही है…</string>
+    <string name="preparing">तैयारी हो रही है…</string>
+    <string name="plant_identified">पौधे की पहचान हुई</string>
+    <string name="disease_detected">रोग मिला</string>
+    <string name="severity_label">गंभीरता: %1$s</string>
+    <string name="healthy_plant">स्वस्थ पौधा!</string>
+    <string name="no_diseases_detected">कोई रोग नहीं मिला</string>
+    <string name="error_loading_analysis">विश्लेषण लोड नहीं हो सका</string>
+    <string name="plant_image">पौधे की फोटो</string>
+    <string name="profile_user_label">कृषि रक्षक उपयोगकर्ता</string>
+    <string name="selected">चुना गया</string>
 </resources>

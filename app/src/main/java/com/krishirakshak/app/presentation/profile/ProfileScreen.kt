@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Home
@@ -53,7 +54,7 @@ fun ProfileScreen(
                     onClick = onNavigateToHome
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Filled.Add, contentDescription = null) },
+                    icon = { Icon(Icons.Filled.List, contentDescription = null) },
                     label = { Text(stringResource(R.string.nav_history)) },
                     selected = false,
                     onClick = onNavigateToHistory
@@ -112,7 +113,7 @@ fun ProfileScreen(
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                         Text(
-                            text = "Krishi Rakshak User",
+                            text = stringResource(R.string.profile_user_label),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                         )

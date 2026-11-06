@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
@@ -17,10 +18,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.krishirakshak.app.R
 import com.krishirakshak.app.domain.entity.Analysis
 import com.krishirakshak.app.domain.entity.AnalysisStatus
 import java.text.SimpleDateFormat
@@ -41,7 +44,7 @@ fun HistoryScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Analysis History") },
+                title = { Text(stringResource(R.string.history_title)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -51,20 +54,20 @@ fun HistoryScreen(
         bottomBar = {
             NavigationBar {
                 NavigationBarItem(
-                    icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
-                    label = { Text("Home") },
+                    icon = { Icon(Icons.Filled.Home, contentDescription = stringResource(R.string.nav_home)) },
+                    label = { Text(stringResource(R.string.nav_home)) },
                     selected = false,
                     onClick = onNavigateToHome
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Filled.Add, contentDescription = "History") },
-                    label = { Text("History") },
+                    icon = { Icon(Icons.Filled.List, contentDescription = stringResource(R.string.nav_history)) },
+                    label = { Text(stringResource(R.string.nav_history)) },
                     selected = true,
                     onClick = { }
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Filled.Person, contentDescription = "Profile") },
-                    label = { Text("Profile") },
+                    icon = { Icon(Icons.Filled.Person, contentDescription = stringResource(R.string.nav_profile)) },
+                    label = { Text(stringResource(R.string.nav_profile)) },
                     selected = false,
                     onClick = onNavigateToProfile
                 )
@@ -121,8 +124,8 @@ fun HistoryScreen(
     showDeleteDialog?.let { analysisId ->
         AlertDialog(
             onDismissRequest = { showDeleteDialog = null },
-            title = { Text("Delete Analysis") },
-            text = { Text("Are you sure you want to delete this analysis? This action cannot be undone.") },
+            title = { Text(stringResource(R.string.delete_analysis)) },
+            text = { Text(stringResource(R.string.delete_confirmation)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -130,12 +133,12 @@ fun HistoryScreen(
                         showDeleteDialog = null
                     }
                 ) {
-                    Text("Delete")
+                    Text(stringResource(R.string.delete))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = null }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -164,7 +167,7 @@ fun AnalysisHistoryItem(
             // Plant image thumbnail
             AsyncImage(
                 model = analysis.imageUrl,
-                contentDescription = "Plant image",
+                contentDescription = stringResource(R.string.plant_image),
                 modifier = Modifier
                     .size(80.dp)
                     .clip(RoundedCornerShape(8.dp))
@@ -182,7 +185,7 @@ fun AnalysisHistoryItem(
                 // Plant type and disease
                 Column {
                     Text(
-                        text = analysis.plantType ?: "Unknown Plant",
+                        text = analysis.plantType ?: stringResource(R.string.unknown_plant),
                         style = MaterialTheme.typography.titleMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -223,7 +226,7 @@ fun AnalysisHistoryItem(
             ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete",
+                    contentDescription = stringResource(R.string.delete),
                     tint = MaterialTheme.colorScheme.error
                 )
             }
@@ -234,10 +237,10 @@ fun AnalysisHistoryItem(
 @Composable
 fun StatusChip(status: AnalysisStatus, modifier: Modifier = Modifier) {
     val (text, color) = when (status) {
-        AnalysisStatus.PENDING -> "Pending" to MaterialTheme.colorScheme.tertiary
-        AnalysisStatus.PROCESSING -> "Processing" to MaterialTheme.colorScheme.primary
-        AnalysisStatus.COMPLETED -> "Completed" to MaterialTheme.colorScheme.secondary
-        AnalysisStatus.FAILED -> "Failed" to MaterialTheme.colorScheme.error
+        AnalysisStatus.PENDING -> stringResource(R.string.status_pending) to MaterialTheme.colorScheme.tertiary
+        AnalysisStatus.PROCESSING -> stringResource(R.string.status_processing) to MaterialTheme.colorScheme.primary
+        AnalysisStatus.COMPLETED -> stringResource(R.string.status_completed) to MaterialTheme.colorScheme.secondary
+        AnalysisStatus.FAILED -> stringResource(R.string.status_failed) to MaterialTheme.colorScheme.error
     }
 
     Surface(
@@ -272,14 +275,14 @@ fun EmptyHistoryView(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "No Analysis History",
+            text = stringResource(R.string.no_history_title),
             style = MaterialTheme.typography.headlineSmall
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Start analyzing plants to see your history here",
+            text = stringResource(R.string.no_history_message),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -289,7 +292,7 @@ fun EmptyHistoryView(
         Button(onClick = onNavigateToCamera) {
             Icon(Icons.Filled.Add, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Analyze Plant")
+            Text(stringResource(R.string.analyze_plant))
         }
     }
 }
@@ -313,7 +316,7 @@ fun ErrorView(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Error Loading History",
+            text = stringResource(R.string.error_loading_history),
             style = MaterialTheme.typography.headlineSmall
         )
 
@@ -328,7 +331,7 @@ fun ErrorView(
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(onClick = onRetry) {
-            Text("Retry")
+            Text(stringResource(R.string.retry))
         }
     }
 }

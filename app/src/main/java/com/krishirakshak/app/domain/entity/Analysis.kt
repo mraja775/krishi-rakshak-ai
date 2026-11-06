@@ -13,7 +13,9 @@ data class Analysis(
     val confidence: Float,
     val recommendations: List<String>,
     val timestamp: Long,
-    val status: AnalysisStatus
+    val status: AnalysisStatus,
+    /** Server-side failure reason (not stored in Room). */
+    val errorMessage: String? = null
 )
 
 /**

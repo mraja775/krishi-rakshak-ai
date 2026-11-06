@@ -8,9 +8,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.krishirakshak.app.R
 import com.krishirakshak.app.util.isValidIndianPhoneNumber
 
 @Composable
@@ -46,14 +48,14 @@ fun PhoneInputScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Welcome to Krishi Rakshak",
+            text = stringResource(R.string.welcome_to_app),
             style = MaterialTheme.typography.headlineSmall
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Enter your mobile number to continue",
+            text = stringResource(R.string.phone_enter_to_continue),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -63,7 +65,7 @@ fun PhoneInputScreen(
         OutlinedTextField(
             value = phoneNumber,
             onValueChange = { viewModel.updatePhoneNumber(it) },
-            label = { Text("Mobile Number") },
+            label = { Text(stringResource(R.string.phone_number_label)) },
             placeholder = { Text("9876543210") },
             leadingIcon = { Text("+91") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
@@ -74,7 +76,7 @@ fun PhoneInputScreen(
 
         if (phoneNumber.isNotEmpty() && !phoneNumber.isValidIndianPhoneNumber()) {
             Text(
-                text = "Please enter a valid 10-digit mobile number",
+                text = stringResource(R.string.error_invalid_mobile_10_digit),
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(top = 4.dp)
@@ -96,7 +98,7 @@ fun PhoneInputScreen(
                     modifier = Modifier.size(20.dp)
                 )
             } else {
-                Text("Send OTP")
+                Text(stringResource(R.string.send_otp))
             }
         }
 

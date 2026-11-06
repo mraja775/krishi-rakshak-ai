@@ -11,6 +11,8 @@ import com.krishirakshak.app.domain.repository.UploadProgress
 import com.krishirakshak.app.util.Result
 import com.krishirakshak.app.util.generateUniqueId
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,15 +31,35 @@ class AnalysisViewModel @Inject constructor(
     val uiState: StateFlow<AnalysisUiState> = _uiState.asStateFlow()
 
     private var currentAnalysisId: String? = null
+    private var lastImagePath: String? = null
+    private var analysisJob: Job? = null
+    private var observeJob: Job? = null
+    private var timeoutJob: Job? = null
+
+    companion object {
+        /** Give up waiting after this long (bad network, stuck backend). */
+        private const val ANALYSIS_TIMEOUT_MS = 120_000L
+    }
 
     /**
      * Start analysis by uploading image and creating analysis record
      */
     fun startAnalysis(compressedImagePath: String) {
-        viewModelScope.launch {
+        lastImagePath = compressedImagePath
+        cancelJobs()
+        _uiState.value = AnalysisUiState.Initial
+        timeoutJob = viewModelScope.launch {
+            delay(ANALYSIS_TIMEOUT_MS)
+            val s = _uiState.value
+            if (s !is AnalysisUiState.Success && s !is AnalysisUiState.Error) {
+                Timber.w("Analysis timed out after ${ANALYSIS_TIMEOUT_MS}ms")
+                fail(AnalysisError.TIMEOUT)
+            }
+        }
+        analysisJob = viewModelScope.launch {
             val userId = firebaseAuth.currentUser?.uid
             if (userId == null) {
-                _uiState.value = AnalysisUiState.Error("User not authenticated")
+                fail(AnalysisError.GENERIC)
                 return@launch
             }
 
@@ -56,7 +78,7 @@ class AnalysisViewModel @Inject constructor(
                         createAnalysisRecord(analysisId, userId, progress.downloadUrl, compressedImagePath)
                     }
                     is UploadProgress.Error -> {
-                        _uiState.value = AnalysisUiState.Error(progress.message)
+                        fail(AnalysisError.UPLOAD)
                         Timber.e("Upload failed: ${progress.message}")
                     }
                 }
@@ -91,7 +113,7 @@ class AnalysisViewModel @Inject constructor(
                 observeAnalysis(analysisId)
             }
             is Result.Error -> {
-                _uiState.value = AnalysisUiState.Error(result.message ?: "Failed to create analysis")
+                fail(AnalysisError.UPLOAD)
                 Timber.e(result.exception, "Failed to create analysis record")
             }
             is Result.Loading -> {
@@ -101,17 +123,35 @@ class AnalysisViewModel @Inject constructor(
     }
 
     private fun observeAnalysis(analysisId: String) {
-        viewModelScope.launch {
+        observeJob?.cancel()
+        observeJob = viewModelScope.launch {
             analysisRepository.observeAnalysisById(analysisId).collect { analysis ->
                 if (analysis != null && analysis.status == AnalysisStatus.COMPLETED) {
+                    timeoutJob?.cancel()
                     _uiState.value = AnalysisUiState.Success(analysis)
                     Timber.d("Analysis completed: ${analysis.id}")
                 } else if (analysis != null && analysis.status == AnalysisStatus.FAILED) {
-                    _uiState.value = AnalysisUiState.Error("AI analysis failed")
-                    Timber.e("Analysis failed: ${analysis.id}")
+                    Timber.e("Analysis failed: ${analysis.id}: ${analysis.errorMessage}")
+                    fail(AnalysisError.fromServerMessage(analysis.errorMessage))
                 }
             }
         }
+    }
+
+    /** Retry the last image after a failure. */
+    fun retry() {
+        lastImagePath?.let { startAnalysis(it) }
+    }
+
+    private fun fail(error: AnalysisError) {
+        cancelJobs()
+        _uiState.value = AnalysisUiState.Error(error)
+    }
+
+    private fun cancelJobs() {
+        timeoutJob?.cancel()
+        observeJob?.cancel()
+        analysisJob?.cancel()
     }
 
     /**
@@ -125,6 +165,7 @@ class AnalysisViewModel @Inject constructor(
     }
 
     fun resetState() {
+        cancelJobs()
         _uiState.value = AnalysisUiState.Initial
         currentAnalysisId = null
     }

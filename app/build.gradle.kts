@@ -24,8 +24,24 @@ android {
         }
     }
 
+    // Release signing. Values come from ~/.gradle/gradle.properties (never from
+    // this repo). If they're missing (CI, contributors), the release build is
+    // simply left unsigned. See docs/SETUP.md.
+    val releaseStoreFile = providers.gradleProperty("KRISHI_RELEASE_STORE_FILE").orNull
+    signingConfigs {
+        if (releaseStoreFile != null) {
+            create("release") {
+                storeFile = file(releaseStoreFile)
+                storePassword = providers.gradleProperty("KRISHI_RELEASE_STORE_PASSWORD").get()
+                keyAlias = providers.gradleProperty("KRISHI_RELEASE_KEY_ALIAS").get()
+                keyPassword = providers.gradleProperty("KRISHI_RELEASE_KEY_PASSWORD").get()
+            }
+        }
+    }
+
     buildTypes {
         release {
+            signingConfigs.findByName("release")?.let { signingConfig = it }
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(

@@ -111,4 +111,37 @@
     <string name="close">மூடு</string>
     <string name="save">சேமி</string>
     <string name="loading">ஏற்றுகிறது…</string>
+    <string name="error_upload_message">புகைப்படத்தைப் பதிவேற்ற முடியவில்லை. இணைய இணைப்பைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.</string>
+    <string name="error_timeout_message">இதற்கு அதிக நேரம் ஆகிறது. இணைய இணைப்பைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.</string>
+    <string name="error_rate_limit_message">ஒரு மணி நேரத்திற்கு 20 பகுப்பாய்வுகள் என்ற வரம்பை அடைந்துவிட்டீர்கள். பிறகு மீண்டும் முயற்சிக்கவும்.</string>
+    <string name="error_service_busy_message">சேவை இப்போது பிஸியாக உள்ளது. பிறகு மீண்டும் முயற்சிக்கவும்.</string>
+    <string name="error_generic_message">இந்தப் புகைப்படத்தைப் பகுப்பாய்வு செய்ய முடியவில்லை. இலையின் தெளிவான, அருகில் எடுத்த புகைப்படத்துடன் மீண்டும் முயற்சிக்கவும்.</string>
+    <string name="try_again">மீண்டும் முயற்சிக்கவும்</string>
+    <string name="back_to_home">முகப்புக்குத் திரும்பு</string>
+
+    <!-- Screen text (localized UI chrome) -->
+    <string name="app_tagline">செடி நோய் கண்டறிதல்</string>
+    <string name="welcome_to_app">கிருஷி ரக்ஷக்கிற்கு வரவேற்கிறோம்</string>
+    <string name="phone_enter_to_continue">தொடர உங்கள் மொபைல் எண்ணை உள்ளிடவும்</string>
+    <string name="error_invalid_mobile_10_digit">சரியான 10 இலக்க மொபைல் எண்ணை உள்ளிடவும்</string>
+    <string name="verify_otp_title">OTP ஐச் சரிபார்க்கவும்</string>
+    <string name="otp_sent_to">இந்த எண்ணுக்கு அனுப்பப்பட்ட 6 இலக்க குறியீட்டை உள்ளிடவும்</string>
+    <string name="resend_otp_in">%1$d வினாடிகளில் OTP ஐ மீண்டும் அனுப்பலாம்</string>
+    <string name="capture_plant_image">செடியின் புகைப்படம் எடுக்கவும்</string>
+    <string name="camera_permission_required">கேமரா அனுமதி தேவை</string>
+    <string name="camera_permission_rationale">நோயைக் கண்டறிய செடிகளின் புகைப்படங்களை எடுக்க கேமரா அனுமதி தேவை.</string>
+    <string name="grant_permission">அனுமதி வழங்கவும்</string>
+    <string name="preview_image">புகைப்பட முன்னோட்டம்</string>
+    <string name="captured_plant_image">எடுக்கப்பட்ட செடியின் புகைப்படம்</string>
+    <string name="optimizing_image">புகைப்படம் தயார் செய்யப்படுகிறது…</string>
+    <string name="preparing">தயாராகிறது…</string>
+    <string name="plant_identified">செடி கண்டறியப்பட்டது</string>
+    <string name="disease_detected">நோய் கண்டறியப்பட்டது</string>
+    <string name="severity_label">தீவிரம்: %1$s</string>
+    <string name="healthy_plant">ஆரோக்கியமான செடி!</string>
+    <string name="no_diseases_detected">எந்த நோயும் கண்டறியப்படவில்லை</string>
+    <string name="error_loading_analysis">பகுப்பாய்வை ஏற்ற முடியவில்லை</string>
+    <string name="plant_image">செடியின் புகைப்படம்</string>
+    <string name="profile_user_label">கிருஷி ரக்ஷக் பயனர்</string>
+    <string name="selected">தேர்ந்தெடுக்கப்பட்டது</string>
 </resources>

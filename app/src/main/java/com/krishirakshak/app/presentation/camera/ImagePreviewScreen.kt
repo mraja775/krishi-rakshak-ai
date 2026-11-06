@@ -14,9 +14,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
+import com.krishirakshak.app.R
 import timber.log.Timber
 
 /**
@@ -52,10 +54,10 @@ fun ImagePreviewScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Preview Image") },
+                title = { Text(stringResource(R.string.preview_image)) },
                 navigationIcon = {
                     IconButton(onClick = onRetake) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Retake")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.retake))
                     }
                 }
             )
@@ -69,7 +71,7 @@ fun ImagePreviewScreen(
             // Display image
             Image(
                 painter = rememberAsyncImagePainter(imageUri),
-                contentDescription = "Captured plant image",
+                contentDescription = stringResource(R.string.captured_plant_image),
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp),
@@ -95,7 +97,7 @@ fun ImagePreviewScreen(
                         .height(56.dp),
                     enabled = uiState !is CameraUiState.Compressing
                 ) {
-                    Text("🔄 Retake")
+                    Text("🔄 " + stringResource(R.string.retake))
                 }
 
                 Spacer(modifier = Modifier.width(16.dp))
@@ -132,7 +134,7 @@ fun ImagePreviewScreen(
                                 modifier = Modifier.size(20.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Use Photo")
+                            Text(stringResource(R.string.use_photo))
                         }
                     }
                 }
@@ -155,7 +157,7 @@ fun ImagePreviewScreen(
                         )
                         Spacer(modifier = Modifier.width(16.dp))
                         Text(
-                            text = "Optimizing image...",
+                            text = stringResource(R.string.optimizing_image),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }
