@@ -87,7 +87,7 @@ play-services-auth = { module = "com.google.android.gms:play-services-auth", ver
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
 hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
-hilt-work = "androidx.hilt:hilt-work:1.1.0"
+hilt-work = "androidx.hilt:hilt-work:1.4.0"
 
 # Room
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
