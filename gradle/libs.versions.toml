@@ -5,7 +5,7 @@ minSdk = "26"
 targetSdk = "34"
 
 # Kotlin & AGP
-kotlin = "1.9.22"
+kotlin = "2.4.21"
 agp = "8.2.2"
 ksp = "1.9.22-1.0.17"
 
