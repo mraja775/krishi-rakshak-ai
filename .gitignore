@@ -111,3 +111,6 @@ functions/.env*
 
 # Keep the release source set (the generic "release/" rule above would hide it)
 !app/src/release/
+
+# Local video working files (published copy lives in docs/media/)
+demo-video/
