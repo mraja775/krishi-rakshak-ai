@@ -9,10 +9,15 @@ Krishi Rakshak AI ("farmer protector") is an open-source Android app. A farmer p
 
 > **Status:** early (v1.0.0). The app works end to end, but it isn't on the Play Store yet. Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-<!-- Screenshots: add images under docs/images/ and reference them here. -->
-| Home | Result | History |
-|------|--------|---------|
-| _screenshot_ | _screenshot_ | _screenshot_ |
+### ▶️ Watch the 1-minute demo
+
+[![Krishi Rakshak AI: 1-minute demo video](docs/media/demo-poster.jpg)](docs/media/krishi-rakshak-ai-demo.mp4)
+
+_Click the image to play the video (60 seconds, with narration). It shows the problem, how the app works, two user flows and two example farmer stories._
+
+| Home | Result | History | Tamil |
+|------|--------|---------|-------|
+| <img src="docs/images/home.png" width="200" alt="Home screen with the Analyze Plant button"> | <img src="docs/images/result.png" width="200" alt="Result screen: Potato, Late Blight, medium severity, 95% confidence, with recommendations"> | <img src="docs/images/history.png" width="200" alt="History screen listing past analyses"> | <img src="docs/images/home-tamil.png" width="200" alt="Home screen in Tamil"> |
 
 ## Features
 
@@ -92,3 +97,5 @@ AI diagnoses can be wrong. The app gives guidance only. It doesn't replace advic
 ## License
 
 [Apache License 2.0](LICENSE) © 2026 Raja Mohan
+
+The demo video and screenshots under `docs/media/` and `docs/images/` include third-party photos under their own licences. See [docs/media/CREDITS.md](docs/media/CREDITS.md).
